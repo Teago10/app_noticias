@@ -1,3 +1,4 @@
+import 'package:app_noticias/detalhe_noticia_page.dart';
 import 'package:app_noticias/model/noticia.dart';
 import 'package:app_noticias/services/noticias_service.dart';
 import 'package:app_noticias/services/sobre_page.dart';
@@ -131,82 +132,89 @@ class _HomePageState extends State<HomePage> {
                   itemBuilder: (context, index) {
                     final noticia = noticias[index];
 
-                    return Card(
-                      margin: const EdgeInsets.only(bottom: 12),
-                      elevation: 0,
-                      color: Colors.white,
-                      clipBehavior: Clip.antiAlias,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                        side: const BorderSide(color: Color(0xFFCBD2D9)),
+                    return InkWell(
+                      onTap: () => Navigator.push(context,
+                      MaterialPageRoute(builder: (context) =>
+                        DetalheNoticiaPage(noticia: noticia)
                       ),
-                      child: Column(
-                        children: [
-                          Container(
-                            width: double.infinity,
-                            height: 120,
-                            color: const Color(0xFFE4E9Ef),
-                            child: Image.network(
-                              noticia.imagem!, 
-                              fit: BoxFit.cover,
-                              errorBuilder: (context, error, stack) => Icon(Icons.image_outlined),
+                      ),
+                      child: Card(
+                        margin: const EdgeInsets.only(bottom: 12),
+                        elevation: 0,
+                        color: Colors.white,
+                        clipBehavior: Clip.antiAlias,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          side: const BorderSide(color: Color(0xFFCBD2D9)),
+                        ),
+                        child: Column(
+                          children: [
+                            Container(
+                              width: double.infinity,
+                              height: 120,
+                              color: const Color(0xFFE4E9Ef),
+                              child: Image.network(
+                                noticia.imagem!, 
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stack) => const Icon(Icons.image_outlined),
+                              ),
                             ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.all(12),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  children: [
-                                    Container(
-                                      decoration: BoxDecoration(
-                                        color: const Color(0xFFEFF4F8),
-                                        borderRadius: BorderRadius.circular(10),
-                                        border: Border.all(
-                                          color: Colors.deepPurple,
+                            Padding(
+                              padding: const EdgeInsets.all(12),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    children: [
+                                      Container(
+                                        decoration: BoxDecoration(
+                                          color: const Color(0xFFEFF4F8),
+                                          borderRadius: BorderRadius.circular(10),
+                                          border: Border.all(
+                                            color: Colors.deepPurple,
+                                          ),
+                                        ),
+                                        child: Text(
+                                          noticia.categoriaNome
+                                          ),
+                                      ),
+                                      const SizedBox(
+                                        width: 15,
+                                      ),
+                                      Text(
+                                        noticia.dataFormatada,
+                                        style: const TextStyle(
+                                          color: Color(0xFF858D96),
                                         ),
                                       ),
-                                      child: Text(
-                                        noticia.categoriaNome
-                                        ),
-                                    ),
-                                    const SizedBox(
-                                      width: 15,
-                                    ),
-                                    Text(
-                                      noticia.dataFormatada,
-                                      style: const TextStyle(
-                                        color: Color(0xFF858D96),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 8),
-                                Text(
-                                  noticia.titulo,
-                                  style: const TextStyle(
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.bold,
+                                    ],
                                   ),
-                                  maxLines: 2,
-                                  overflow: TextOverflow
-                                      .ellipsis, // coloca ... no final caso o texto ultrapasse duas linhas
-                                ),
-                                const SizedBox(height: 8),
-                                Text(
-                                  noticia.resumo,
-                                  style: const TextStyle(
-                                    fontSize: 12,
-                                    color: Color(0xFF586879),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    noticia.titulo,
+                                    style: const TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                    maxLines: 2,
+                                    overflow: TextOverflow
+                                        .ellipsis, // coloca ... no final caso o texto ultrapasse duas linhas
                                   ),
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ],
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    noticia.resumo,
+                                    style: const TextStyle(
+                                      fontSize: 12,
+                                      color: Color(0xFF586879),
+                                    ),
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ],
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     );
                   },
