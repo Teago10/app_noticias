@@ -9,7 +9,7 @@ class CategoriasServices {
   
   static const String baseUrl = 'http://10.0.2.2:8000/api';
 
-  Future<List<Categoria>> getNoticia() async{
+  Future<List<Categoria>> getCategoria() async{
     final resposta = await http.get(Uri.parse('$baseUrl/categorias'));
 
     try {
