@@ -19,10 +19,10 @@ class NoticiasService {
         return dados.map((item) => Noticia.fromJson(item)).toList();
 
       }else{
-        throw Exception('Não foi possivel carregar as notícias');
+        throw 'Não foi possivel carregar as notícias';
       }
     } catch (e) {
-      throw Exception('Não foi possivel conectar, erro: $e');
+      throw Exception('$e');
 
     }
 
