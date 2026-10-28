@@ -100,6 +100,17 @@ class _LoginPageState extends State<LoginPage> {
               const SizedBox(
                 height: 20,
               ),
+
+              if(_mensagemErro != null) ...[
+                Text(
+                  _mensagemErro!,
+                  style: const TextStyle(color: Colors.red),
+                )
+              ],
+
+              const SizedBox(
+                height: 20,
+              ),
           
               ElevatedButton(
                 onPressed: _carregando ? null : autenticar, 
