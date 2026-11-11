@@ -1,3 +1,4 @@
+import 'package:app_noticias/cadastrar_noticia_page.dart';
 import 'package:app_noticias/detalhe_noticia_page.dart';
 import 'package:app_noticias/login_page.dart';
 import 'package:app_noticias/model/categoria.dart';
@@ -160,6 +161,23 @@ class _HomePageState extends State<HomePage> {
                   context,
                   MaterialPageRoute(
                     builder: (context) => const SobrePage(),
+                  ),
+                );
+              },
+            ),
+
+            const Divider(),
+
+            ListTile(
+              leading: const Icon(Icons.info_outline),
+              title: const Text('Cadastrar Notícia'),
+              onTap: () {
+                Navigator.pop(context);
+
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const CadastrarNoticiaPage(),
                   ),
                 );
               },
