@@ -1,12 +1,15 @@
 import 'dart:io';
 
 import 'package:app_noticias/model/categoria.dart';
+import 'package:app_noticias/model/noticia.dart';
 import 'package:app_noticias/services/categorias_services.dart';
 import 'package:app_noticias/services/noticias_service.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 
 class CadastrarNoticiaPage extends StatefulWidget {
-  const CadastrarNoticiaPage({super.key});
+  final Noticia? noticia;
+  const CadastrarNoticiaPage({super.key, this.noticia});
 
   @override
   State<CadastrarNoticiaPage> createState() => _CadastrarNoticiaPageState();
@@ -23,11 +26,22 @@ class _CadastrarNoticiaPageState extends State<CadastrarNoticiaPage> {
   File? _imagemSelecionada;
   List<Categoria> _categorias = [];
   int? _categoriaSelecionadaId;
+  final bool _status = true;
+
+  final ImagePicker picker = ImagePicker();
 
   @override
   void initState() {
     super.initState();
     carregarCategorias();
+  }
+
+  @override
+  void dispose() {
+    _tituloController.dispose();
+    _resumoController.dispose();
+    _conteudoController.dispose();
+    super.dispose();
   }
 
   Future<void> carregarCategorias() async {
@@ -41,6 +55,109 @@ class _CadastrarNoticiaPageState extends State<CadastrarNoticiaPage> {
       });
     } catch (e) {
       debugPrint('Erro ao carregar categorias: $e');
+    }
+  }
+
+  Future<void> salvarNoticia() async {
+    if (_tituloController.text.isEmpty ||
+        _resumoController.text.isEmpty ||
+        _conteudoController.text.isEmpty ||
+        _categoriaSelecionadaId == null ||
+        (widget.noticia == null && _imagemSelecionada == null)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Preencha todos os campos obrigatorios'),
+        ),
+      );
+
+      return;
+    }
+
+    try {
+      if (widget.noticia == null) {
+        // cadastrar
+        await _noticiasService.criarNoticia(
+          titulo: _tituloController.text,
+          resumo: _resumoController.text,
+          conteudo: _conteudoController.text,
+          categoriaId: _categoriaSelecionadaId!,
+          status: _status,
+          imagemArquivo: _imagemSelecionada,
+        );
+      } else {
+        // editar
+
+        await _noticiasService.editarNoticia(
+          id: widget.noticia!.id,
+          titulo: _tituloController.text,
+          resumo: _resumoController.text,
+          conteudo: _conteudoController.text,
+          categoriaId: _categoriaSelecionadaId!,
+          status: _status,
+          imagemArquivo: _imagemSelecionada,
+        );
+      }
+
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            widget.noticia == null
+                ? 'Noticia cadastrada com sucesso'
+                : 'Noticia atualizada com sucesso',
+          ),
+        ),
+      );
+    } catch (e) {
+      print(e);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Erro ao cadastrar noticia.'),
+        ),
+      );
+    }
+  }
+
+  Future<void> _selecionarImagem(ImageSource origem) async {
+    final arquivo = await ImagePicker().pickImage(source: origem);
+    if (arquivo != null) {
+      setState(() {
+        _imagemSelecionada = File(arquivo.path);
+      });
+    }
+  }
+
+  Future<void> _publicarNoticia() async {
+    if (_tituloController.text.isEmpty ||
+        _resumoController.text.isEmpty ||
+        _conteudoController.text.isEmpty ||
+        _categoriaSelecionadaId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Preencha todos os campos obrigatórios')),
+      );
+      return;
+    }
+
+    try {
+      await _noticiasService.criarNoticia(
+        titulo: _tituloController.text,
+        resumo: _resumoController.text,
+        conteudo: _conteudoController.text,
+        categoriaId: _categoriaSelecionadaId!,
+        status: true,
+        imagemArquivo: _imagemSelecionada,
+      );
+
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Notícia publicada com sucesso')),
+      );
+      Navigator.pop(context);
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('$e')),
+      );
     }
   }
 
@@ -61,9 +178,7 @@ class _CadastrarNoticiaPageState extends State<CadastrarNoticiaPage> {
               border: OutlineInputBorder(),
             ),
           ),
-          const SizedBox(
-            height: 15,
-          ),
+          const SizedBox(height: 15),
 
           TextFormField(
             controller: _resumoController,
@@ -74,9 +189,7 @@ class _CadastrarNoticiaPageState extends State<CadastrarNoticiaPage> {
               border: OutlineInputBorder(),
             ),
           ),
-          const SizedBox(
-            height: 15,
-          ),
+          const SizedBox(height: 15),
 
           TextFormField(
             controller: _conteudoController,
@@ -87,17 +200,12 @@ class _CadastrarNoticiaPageState extends State<CadastrarNoticiaPage> {
               border: OutlineInputBorder(),
             ),
           ),
-          const SizedBox(
-            height: 15,
-          ),
+          const SizedBox(height: 15),
           const Text(
             'Imagem de Capa',
             style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
           ),
-
-          const SizedBox(
-            height: 10,
-          ),
+          const SizedBox(height: 10),
 
           Container(
             height: 160,
@@ -107,73 +215,73 @@ class _CadastrarNoticiaPageState extends State<CadastrarNoticiaPage> {
               border: Border.all(color: Colors.grey),
               borderRadius: BorderRadius.circular(3),
             ),
-
-            child: const Center(
-              child: Icon(
-                Icons.image_outlined,
-                size: 50,
-                color: Colors.grey,
-              ),
-            ),
+            child: _imagemSelecionada == null
+                ? const Center(
+                    child: Icon(
+                      Icons.image_outlined,
+                      size: 50,
+                      color: Colors.grey,
+                    ),
+                  )
+                : Image.file(
+                    _imagemSelecionada!,
+                    fit: BoxFit.cover,
+                    width: double.infinity,
+                    errorBuilder: (context, erro, stack) => const Center(
+                      child: Icon(
+                        Icons.image_outlined,
+                        size: 50,
+                        color: Colors.grey,
+                      ),
+                    ),
+                  ),
           ),
 
-          const SizedBox(
-            height: 10,
-          ),
+          const SizedBox(height: 10),
 
           Row(
             children: [
               Expanded(
                 child: OutlinedButton.icon(
-                  onPressed: () {},
-                  icon: const Icon(
-                    Icons.camera_alt,
-                  ),
+                  onPressed: () => _selecionarImagem(ImageSource.camera),
+                  icon: const Icon(Icons.camera_alt),
                   label: const Text('Câmera'),
                 ),
               ),
-
-              const SizedBox(
-                width: 10,
-              ),
-
+              const SizedBox(width: 10),
               Expanded(
                 child: OutlinedButton.icon(
-                  onPressed: () {},
-                  icon: const Icon(
-                    Icons.photo_library,
-                  ),
+                  onPressed: () => _selecionarImagem(ImageSource.gallery),
+                  icon: const Icon(Icons.photo_library),
                   label: const Text('Galeria'),
                 ),
               ),
             ],
           ),
-          const SizedBox(
-            height: 15,
-          ),
-          DropdownButtonFormField(
+          const SizedBox(height: 15),
+
+          DropdownButtonFormField<int>(
             decoration: const InputDecoration(
               labelText: 'Categorias',
               floatingLabelBehavior: FloatingLabelBehavior.always,
               border: OutlineInputBorder(),
             ),
-
             initialValue: _categoriaSelecionadaId,
             items: _categorias.map((categoria) {
-              return DropdownMenuItem(
+              return DropdownMenuItem<int>(
                 value: categoria.id,
                 child: Text(categoria.nome),
               );
             }).toList(),
             onChanged: (valor) {
-              _categoriaSelecionadaId = valor;
+              setState(() {
+                _categoriaSelecionadaId = valor;
+              });
             },
           ),
-          const SizedBox(
-            height: 25,
-          ),
+          const SizedBox(height: 25),
           ElevatedButton(
-            onPressed: () {},
+            onPressed: _publicarNoticia,
             child: const Text('Publicar noticia'),
           ),
         ],
