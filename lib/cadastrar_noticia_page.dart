@@ -26,7 +26,7 @@ class _CadastrarNoticiaPageState extends State<CadastrarNoticiaPage> {
   File? _imagemSelecionada;
   List<Categoria> _categorias = [];
   int? _categoriaSelecionadaId;
-  final bool _status = true;
+  late bool _status = true;
 
   final ImagePicker picker = ImagePicker();
 
@@ -34,6 +34,14 @@ class _CadastrarNoticiaPageState extends State<CadastrarNoticiaPage> {
   void initState() {
     super.initState();
     carregarCategorias();
+
+    if(widget.noticia != null){
+      _tituloController.text = widget.noticia!.titulo;
+      _resumoController.text = widget.noticia!.resumo;
+      _conteudoController.text = widget.noticia!.conteudo;
+      _categoriaSelecionadaId = widget.noticia!.categoriaId;
+      _status = widget.noticia!.status == true || widget.noticia!.status == 1;
+    }
   }
 
   @override
@@ -165,7 +173,9 @@ class _CadastrarNoticiaPageState extends State<CadastrarNoticiaPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Cadastrar Notícia'),
+        title: Text(
+          widget.noticia == null ? 'Cadastrar Noticia' : 'Editar Noticia',
+        ),
       ),
       body: ListView(
         padding: const EdgeInsets.all(15),
@@ -280,9 +290,27 @@ class _CadastrarNoticiaPageState extends State<CadastrarNoticiaPage> {
             },
           ),
           const SizedBox(height: 25),
+
+          SwitchListTile(
+            value: _status, 
+            contentPadding: EdgeInsets.zero,
+            title: const Text('Publicação ativa'),
+            onChanged: (valor){
+              setState(() {
+                _status = valor;
+              });
+            },
+            
+          
+          ),
+
+          const SizedBox(height: 25),
+
           ElevatedButton(
             onPressed: _publicarNoticia,
-            child: const Text('Publicar noticia'),
+            child: Text(
+              widget.noticia == null ? 'Publicar noticia' : 'Salvar alterações'
+            ),
           ),
         ],
       ),

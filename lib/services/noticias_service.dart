@@ -133,4 +133,6 @@ class NoticiasService {
   }
 
   }
+
+  Future<void> excluirNoticia(int id) async {}
 }
